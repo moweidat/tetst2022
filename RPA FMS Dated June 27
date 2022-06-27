@@ -1,0 +1,147 @@
+defVar --name pdfFile --type Pdf
+defVar --name pageRang --type String --value "1-1"
+defVar --name pdfPageText --type String
+defVar --name startIdx_cards --type Numeric
+defVar --name endIdx_Cards --type Numeric
+defVar --name length_Cards --type Numeric
+defVar --name varCarData --type String
+defVar --name allCardsData_List --type List --innertype String
+defVar --name pageCardsData_list --type List --innertype String
+defVar --name numberOfPDFPAges --type Numeric
+defVar --name pageNoIndex --type Numeric --value 1
+defVar --name pageNumberInd_text --type String
+defVar --name ExcelFile_Read --type Excel
+defVar --name excelRowNO --type Numeric --value 2
+defVar --name excelCellValue --type String
+defVar --name vcardItemIndex --type Numeric
+defVar --name vCardalueFromArray --type String
+defVar --name startINdexQTY --type Numeric
+defVar --name startIndexUPRICE --type Numeric
+defVar --name startIndexCost --type Numeric
+defVar --name qtyData --type String
+defVar --name upriceDAta --type String
+defVar --name costDAta --type String
+defVar --name qtyData_list --type List --innertype String
+defVar --name upriceDAta_list --type List --innertype String
+defVar --name costData_List --type List --innertype String
+defVar --name allQntyDAta_List --type List --innertype String
+defVar --name allupriceData_List --type List --innertype String
+defVar --name allCostData_List --type List --innertype String
+defVar --name qtyValueFromArray --type String
+defVar --name endIndexQTY --type Numeric
+defVar --name lengthQTY --type Numeric
+defVar --name endIndexUPRICE --type Numeric
+defVar --name endIndexCost --type Numeric
+defVar --name lengthUPrice --type Numeric
+defVar --name lengthCost --type Numeric
+defVar --name UPriceValueFromArray --type String
+defVar --name CostValueFromArray --type String
+defVar --name excellValueLength --type Numeric
+defVar --name test --type String
+defVar --name pdfcardcopylist --type List --innertype String
+defVar --name pageCardsData_listCopy --type List --innertype String
+defVar --name unmachedvCardalueFromArray --type String
+defVar --name AddDumyText --type String --value DummyTextByMuath
+defVar --name Test1212 --type Boolean
+defVar --name vCardsCopy_List --type String
+defVar --name vcardItemIndexCopy --type Numeric
+defVar --name vCardalueFromArrayCopy --type String
+defVar --name allCardsData_ListCopy --type List --innertype String
+pdfOpen --file "C:\\Users\\rpa.rd952378\\Desktop\\1- LMAS Detailed.pdf" pdfFile=value
+pdfCount --file ${pdfFile} numberOfPDFPAges=value
+repeat
+	pdfText --range "${pageRang}" --file ${pdfFile} pdfPageText=value
+	writeToFile --value "${pdfPageText}" --file "C:\\Users\\rpa.rd952378\\Desktop\\Test Page Data.txt" --encoding "UTF8" --overwrite
+	parseText --text "${pdfPageText}" --query Price --startindex 1 --comment "find start index for cards" startIdx_cards=value
+	parseText --text "${pdfPageText}" --query Card --startindex 1 --comment "find end index for cards" endIdx_Cards=value
+	parseText --text "${pdfPageText}" --query Date --startindex 150 --comment "find start index for QTY" startINdexQTY=value
+	parseText --text "${pdfPageText}" --query Qty --startindex 1 --comment "find end index for QTY" endIndexQTY=value
+	parseText --text "${pdfPageText}" --query "Qty." --startindex 1 --comment "find start index UPrice" startIndexUPRICE=value
+	parseText --text "${pdfPageText}" --query "U.Price" --startindex 1 --comment "find end index for UPRICE" endIndexUPrice=value
+	parseText --text "${pdfPageText}" --query "V.Card" --startindex 1 --comment "find start index Cost" startIndexCost=value
+	parseText --text "${pdfPageText}" --query Cost --startindex 1 --comment "find end index for Cost" endIndexCost=value
+	evaluate --expression " ${startIdx_cards} + 6" --comment "getstart index vcards" startIdx_cards=value
+	evaluate --expression "${startINdexQTY} +5" --comment "get start index QTY" startINdexQTY=value
+	evaluate --expression "${startIndexUPRICE} +5" --comment "get start index UPRICE" startIndexUPRICE=value
+	evaluate --expression "${startIndexCost} +7" --comment "get start index Cost ..by Muath" startIndexCost=value
+	evaluate --expression "${endIdx_Cards}-3" --comment "get end index Vcards" endIdx_Cards=value
+	evaluate --expression "${endIndexQTY}-2" --comment "get end index Qty" endIndexQTY=value
+	evaluate --expression "${endIndexUPRICE}-1" --comment "get end index Uprice .. Muath" endIndexUPrice=value
+	evaluate --expression "${endIndexCost}-1" --comment "get end index Cost .. Muath" endIndexCost=value
+	evaluate --expression "${endIdx_Cards} - ${startIdx_cards} " --comment "get vCards Length" length_Cards=value
+	evaluate --expression "${endIndexQTY} - ${startINdexQTY}" --comment "get QTY Length" lengthQTY=value
+	evaluate --expression "${endIndexUPRICE} - ${startIndexUPRICE}" --comment "get UPrice Length ..Muath" lengthUPrice=value
+	evaluate --expression "${endIndexCost} - ${startIndexCost}" --comment "get UPrice Cost ..Muath" lengthCost=value
+	getSubString --text "${pdfPageText}" --start ${startIdx_cards} --length ${length_Cards} varCarData=value
+	trimString --text "${varCarData}" --trimoption "TrimStartAndEnd" varCarData=value
+	getSubString --text "${pdfPageText}" --start ${startINdexQTY} --length ${lengthQTY} --comment "get QTY data" qtyData=value
+	getSubString --text "${pdfPageText}" --start ${startIndexUPRICE} --length ${lengthUPrice} --comment "get UPRICE data..Muath" upriceDAta=value
+	getSubString --text "${pdfPageText}" --start ${startIndexCost} --length ${lengthCost} --comment "get Cost data..Muath" costDAta=value
+	//writeToFile --value "${varCarData}" --file "C:\\Users\\rpa.rd952378\\Desktop\\TestCardsData.txt" --encoding "UTF8"
+	splitString --text "${varCarData}" --delimiteroption "StandardDelimiter" --standarddelimiter "NewLine" --count 100 pageCardsData_list=value
+	//writeToFile --value "${pageCardsData_list}" --file "C:\\Users\\rpa.rd952378\\Desktop\\testCardPAgeArray.txt" --encoding "UTF8"
+	splitString --text "${qtyData}" --delimiteroption "StandardDelimiter" --standarddelimiter "NewLine" --count 100 qtyData_list=value
+	splitString --text "${upriceDAta}" --delimiteroption "StandardDelimiter" --standarddelimiter "NewLine" --count 100 upriceDAta_list=value
+	splitString --text "${costDAta}" --delimiteroption "StandardDelimiter" --standarddelimiter "NewLine" --count 100 costData_List=value
+	addRange --source ${pageCardsData_list} --destination ${allCardsData_List}
+	addRange --source ${pageCardsData_list} --destination ${pageCardsData_listCopy}
+	addRange --source ${qtyData_list} --destination ${allQntyDAta_List}
+	addRange --source ${upriceDAta_list} --destination ${allupriceData_List}
+	addRange --source ${costData_List} --destination ${allCostData_List}
+	incrementVar --number ${pageNoIndex}
+	if --left "${pageNoIndex}" --operator "Equal_To" --right 2
+		incrementVar --number ${pageNoIndex}
+	endIf
+	convertNumberToText --number ${pageNoIndex} --conversiontype "SimpleNumber" --decimals 0 pageNumberInd_text=value
+	concatTexts --text "${pageNumberInd_text}" --value "\"-\"" pageRang=value
+	concatTexts --text "${pageRang}" --value "${pageNumberInd_text}" pageRang=value
+until --left "${pageNoIndex}" --operator "Less_Than_Equal_To" --right "${numberOfPDFPAges}"
+//add --collection "${pdfcardcopylist}" --value "${allCardsData_List}"
+writeToFile --value "${allCardsData_List}" --file "C:\\Users\\rpa.rd952378\\Desktop\\testAllCardsValue.txt" --encoding "UTF8" --overwrite
+writeToFile --value "${allQntyDAta_List}" --file "C:\\Users\\rpa.rd952378\\Desktop\\test ALL QTY Values.txt" --encoding "UTF8" --overwrite  --comment "Write to QTY all list"
+writeToFile --value "${allupriceData_List}" --file "C:\\Users\\rpa.rd952378\\Desktop\\test ALL UPRICEValues.txt" --encoding "UTF8" --overwrite  --comment "write to uPrice .. Muath"
+writeToFile --value "${allCostData_List}" --file "C:\\Users\\rpa.rd952378\\Desktop\\test ALL COST Values.txt" --encoding "UTF8" --overwrite  --comment "write to Cost .. Muath"
+excelOpen --file "C:\\Users\\rpa.rd952378\\Desktop\\ConcatinateExcel.xlsx" ExcelFile_Read=value
+excelGet --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 1 excelCellValue=value
+getStringLength --text "${excelCellValue}" excellValueLength=value
+//add --collection "${pageCardsData_listCopy}" --value "${AddDumyText}" --comment "By Muath"
+while --left "${excellValueLength}" --operator "Greater_Than" --right 0
+	indexOf --value "${excelCellValue}" --collection "${allCardsData_List}" vcardItemIndex=value
+	//logMessage --message "${excelCellValue}" --type "Info"
+	//logMessage --message "${vcardItemIndex}" --type "Info"
+	if --left "${vcardItemIndex}" --operator "Greater_Than" --right 0
+		get --collection "${allCardsData_List}" --index "${vcardItemIndex}" --comment "Get vCard array all list" vCardalueFromArray=value
+		removeValue --value "${excelCellValue}" --collection "${pageCardsData_listCopy}"
+		writeToFile --value "${pageCardsData_listCopy}" --file "C:\\Users\\rpa.rd952378\\Desktop\\testAllCardsValue2.txt" --encoding "UTF8" --overwrite
+		//get --collection "${pageCardsData_listCopy}" --index "${vcardItemIndex}" --comment "Test By Muath unmached values in PDF not excel" unmachedvCardalueFromArray=value
+		get --collection "${allQntyDAta_List}" --index "${vcardItemIndex}" --comment "Get Qty array all list" qtyValueFromArray=value
+		get --collection "${allupriceData_List}" --index "${vcardItemIndex}" --comment "Get UPrice array all list  ..Muath" UPriceValueFromArray=value
+		get --collection "${allCostData_List}" --index "${vcardItemIndex}" --comment "Get Cost array all list  ..Muath" CostValueFromArray=value
+		excelSet --value "${vCardalueFromArray}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 5 --comment "Fill vCard full list data in excel "
+		//excelSet --value "${vCardalueFromArray}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 5 --comment "Test By Muath wite unmatched vaule in PDF not in excel"
+		excelSet --value "${qtyValueFromArray}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 6 --comment "Fill QTY full list data in excel "
+		excelSet --value "${UPriceValueFromArray}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 7 --comment "Fill uPrice list data in excel ..Muath"
+		excelSet --value "${CostValueFromArray}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 8 --comment "Fill Cost list data in excel ..Muath"
+	elseIf --left "${vcardItemIndex}" --operator "Equal_To" --right 0
+		excelSet --value "this coupon number doesn\'t exist in KOC Report." --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 5 --comment "Fill vCard full list data in excel "
+		excelSet --value UnMatched --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 6 --comment "Fill QTY full list data in excel "
+		excelSet --value UnMatched --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 7 --comment "Fill uPrice list data in excel ..Muath"
+		excelSet --value UnMatched --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 8 --comment "Fill Cost list data in excel ..Muath"
+	endIf
+	incrementVar --number ${excelRowNO}
+	excelGet --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 1 excelCellValue=value
+	getStringLength --text "${excelCellValue}" excellValueLength=value
+endWhile
+incrementVar --number ${excelRowNO}
+foreach --collection "${pageCardsData_listCopy}" --variable "${vCardsCopy_List}"
+	indexOf --value "${vCardsCopy_List}" --collection "${allCardsData_List}" vcardItemIndexCopy=value
+	excelSet --value "${vCardsCopy_List}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 5 --comment "Fill vCard full list data in excel "
+	get --collection "${allQntyDAta_List}" --index "${vcardItemIndexCopy}" --comment "Get vCard array all list" vCardalueFromArrayCopy=value
+	excelSet --value "${vCardalueFromArrayCopy}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 6 --comment "Fill vCard full list data in excel "
+	get --collection "${allupriceData_List}" --index "${vcardItemIndexCopy}" --comment "Get vCard array all list" vCardalueFromArrayCopy=value
+	excelSet --value "${vCardalueFromArrayCopy}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 7 --comment "Fill vCard full list data in excel "
+	get --collection "${allCostData_List}" --index "${vcardItemIndexCopy}" --comment "Get vCard array all list" vCardalueFromArrayCopy=value
+	excelSet --value "${vCardalueFromArrayCopy}" --file ${ExcelFile_Read} --sheet "All (2)" --row ${excelRowNO} --column 8 --comment "Fill vCard full list data in excel "
+	incrementVar --number ${excelRowNO}
+endFor
+excelClose --file ${ExcelFile_Read} --save
